@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+/* React Flow overrides */
+.react-flow__attribution {
+  display: none;
+}
+
+.react-flow__controls {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.react-flow__controls-button {
+  border-bottom: 1px solid #e2e8f0 !important;
+  background: white !important;
+  color: #475569 !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #f1f5f9 !important;
+}
+
+.react-flow__minimap {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.react-flow__edge-path {
+  stroke-width: 2;
+}
+
+.react-flow__handle {
+  width: 10px !important;
+  height: 10px !important;
+  border: 2px solid white !important;
+  background: #94a3b8 !important;
+  border-radius: 50% !important;
+}
+
+.react-flow__handle:hover {
+  background: #0d9488 !important;
+}
