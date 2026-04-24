@@ -1,4 +1,4 @@
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || ''
+const EDGE_FN_BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/diagram-api`
 
 const SYSTEM_PROMPT = `You are a process diagram generator. Return ONLY valid JSON, no markdown, no backticks, no explanation.
 
@@ -88,9 +88,12 @@ POSITIONING RULES (strictly follow these):
 - Identify all distinct roles/actors mentioned and create one lane per role`
 
 async function postJson(path, body) {
-  const response = await fetch(`${BACKEND_URL}${path}`, {
+  const response = await fetch(`${EDGE_FN_BASE}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+    },
     body: JSON.stringify(body),
   })
   if (!response.ok) {
@@ -134,20 +137,20 @@ function getSystemPrompt(diagramType) {
 
 export async function generateDiagram(prompt, diagramType = 'decision tree') {
   const systemPrompt = getSystemPrompt(diagramType)
-  const data = await postJson('/api/generate-diagram', { prompt, diagramType, systemPrompt })
+  const data = await postJson('/generate-diagram', { prompt, diagramType, systemPrompt })
   return parseDiagramText(data.content?.[0]?.text?.trim())
 }
 
 export async function detectDiagramType(text) {
   try {
-    return await postJson('/api/detect-type', { text })
+    return await postJson('/detect-type', { text })
   } catch {
     return { type: 'Flowchart', confidence: 0.5, reason: 'Detection failed' }
   }
 }
 
 export async function refineDiagramWithDiff(currentDiagram, refinementRequest, diagramType, originalPrompt) {
-  const data = await postJson('/api/refine-diagram', {
+  const data = await postJson('/refine-diagram', {
     currentDiagram,
     refinementRequest,
     diagramType,
@@ -167,16 +170,16 @@ export async function refineDiagramWithDiff(currentDiagram, refinementRequest, d
 }
 
 export async function exportToConfluence({ baseUrl, email, apiToken, spaceKey, pageTitle, parentPage, nodes, edges }) {
-  return postJson('/api/confluence-export', { baseUrl, email, apiToken, spaceKey, pageTitle, parentPage, nodes, edges })
+  return postJson('/confluence-export', { baseUrl, email, apiToken, spaceKey, pageTitle, parentPage, nodes, edges })
 }
 
 export async function extractJiraTasks(nodes, edges) {
-  const data = await postJson('/api/jira-extract-tasks', { nodes, edges })
+  const data = await postJson('/jira-extract-tasks', { nodes, edges })
   return data.tasks || []
 }
 
 export async function createJiraTickets({ baseUrl, email, apiToken, projectKey, tasks }) {
-  return postJson('/api/jira-create-tickets', { baseUrl, email, apiToken, projectKey, tasks })
+  return postJson('/jira-create-tickets', { baseUrl, email, apiToken, projectKey, tasks })
 }
 
 // Legacy — kept for backwards compat (RefinePanel previously called this)
